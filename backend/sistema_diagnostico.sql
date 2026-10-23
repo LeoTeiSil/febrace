@@ -1,8 +1,8 @@
-CREATE DATABASE sistema_diagnostico;
+CREATE DATABASE IF NOT EXISTS sistema_diagnostico;
 
 USE sistema_diagnostico;
 
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     crm VARCHAR(20) UNIQUE NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE usuarios (
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE historico_diagnostico (
+CREATE TABLE IF NOT EXISTS historico_diagnostico (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     doenca_sugerida VARCHAR(255),
@@ -24,7 +24,7 @@ CREATE TABLE historico_diagnostico (
         ON DELETE CASCADE
 );
 
-CREATE TABLE pesquisas (
+CREATE TABLE IF NOT EXISTS pesquisas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id INT NOT NULL,
     termo_pesquisa VARCHAR(255) NOT NULL,
@@ -35,10 +35,17 @@ CREATE TABLE pesquisas (
         ON DELETE CASCADE
 );
 
-CREATE TABLE perguntas_rag (
+CREATE TABLE IF NOT EXISTS perguntas_rag (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pergunta TEXT NOT NULL,
     resposta TEXT,
     fontes TEXT,
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS dados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data DATETIME DEFAULT CURRENT_TIMESTAMP,
+    pergunta TEXT NOT NULL,
+    resposta TEXT NOT NULL
 );
