@@ -31,6 +31,12 @@ const Informacoes: React.FC = () => {
           `http://127.0.0.1:8000/doenca/${doenca}`
         );
 
+        if (!response.ok) {
+          console.error("Erro na resposta:", response.status);
+          setLoading(false);
+          return;
+        }
+
         const data = await response.json();
 
         setDados(data);
@@ -97,9 +103,13 @@ const Informacoes: React.FC = () => {
 
           <ul className="lista">
 
-            {dados.sintomas.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
+            {dados.sintomas && dados.sintomas.length > 0 ? (
+              dados.sintomas.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))
+            ) : (
+              <li>Sintomas não disponíveis</li>
+            )}
 
           </ul>
 
@@ -107,9 +117,13 @@ const Informacoes: React.FC = () => {
 
           <ul className="tratamentos-grid">
 
-            {dados.tratamentos.map((item, index) => (
-              <li key={index}>{item}</li>
-            ))}
+            {dados.tratamentos && dados.tratamentos.length > 0 ? (
+              dados.tratamentos.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))
+            ) : (
+              <li>Tratamentos não disponíveis</li>
+            )}
 
           </ul>
 

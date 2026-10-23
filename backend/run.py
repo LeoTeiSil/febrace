@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+﻿from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from sqlalchemy import create_engine, text
@@ -344,6 +344,68 @@ def respostas_llm():
 
     except Exception as e:
         print("ERRO LLM:", e)
+        return jsonify({"erro": str(e)}), 500
+
+
+# =========================
+# DOENCA POR NOME
+# =========================
+
+@app.route("/doenca/<nome>", methods=["GET"])
+def get_doenca(nome):
+
+    try:
+
+        if not nome:
+            return jsonify({"erro": "Nome da doenca nao fornecido"}), 400
+
+        from app.rag import criar_chain_rag
+
+        rag = criar_chain_rag()
+        if not rag:
+            return jsonify({
+                "descricao": "Sistema RAG indisponivel.",
+                "sintomas": [],
+                "tratamentos": [],
+                "aviso": "Consulte um medico."
+            })
+
+        pergunta = (
+            f"Forneca informacoes detalhadas sobre a doenca \'{nome}\'. "
+            "Responda APENAS com um objeto JSON valido (sem texto extra, sem markdown, sem blocos de codigo) "
+            "com os campos: descricao (string), sintomas (array de strings), "
+            "tratamentos (array de strings), aviso (string)."
+        )
+
+        resultado = rag.invoke({"input": pergunta})
+
+        texto = ""
+        if isinstance(resultado, dict):
+            texto = resultado.get("answer") or resultado.get("result", "")
+        else:
+            texto = str(resultado)
+
+        # Tenta extrair JSON da resposta
+        import re as _re2, json as _json2
+        m = _re2.search(r"\{[\s\S]*\}", texto or "")
+        if m:
+            try:
+                dados = _json2.loads(m.group())
+                return jsonify(dados)
+            except _json2.JSONDecodeError:
+                pass
+
+        # Fallback: retorna texto como descricao
+        return jsonify({
+            "descricao": texto or f"Informacoes sobre {nome} nao disponiveis.",
+            "sintomas": [],
+            "tratamentos": [],
+            "aviso": "Consulte um medico para diagnostico correto."
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"erro": str(e)}), 500
 
 

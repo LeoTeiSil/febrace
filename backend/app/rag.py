@@ -1,4 +1,4 @@
-import os
+﻿import os
 from pathlib import Path
 from dotenv import load_dotenv
 import traceback
@@ -18,7 +18,7 @@ DADOS_DIR = BASE_DIR / "dados"
 FAISS_DIR = BASE_DIR / "vetores_doencas"
 
 if not DADOS_DIR.exists():
-    raise FileNotFoundError(f"Pasta 'dados' não encontrada em {DADOS_DIR}")
+    raise FileNotFoundError(f"Pasta 'dados' nÃ£o encontrada em {DADOS_DIR}")
 
 
 def criar_chain_rag():
@@ -30,7 +30,7 @@ def criar_chain_rag():
 
         if not FAISS_DIR.exists():
             raise RuntimeError(
-                "❌ Índice FAISS não encontrado. Execute primeiro: python vetorizador.py"
+                "âŒ Ãndice FAISS nÃ£o encontrado. Execute primeiro: python vetorizador.py"
             )
 
         vectorstore = FAISS.load_local(
@@ -45,24 +45,24 @@ def criar_chain_rag():
         )
 
         llm = ChatGroq(
-            model="llama-3.1-8b-instant",
+            model="openai/gpt-oss-120b",
             temperature=0,
             api_key=os.getenv("GROQ_API_KEY")
         )
 
-        # PROMPT PARA MÉDICOS
+        # PROMPT PARA MÃ‰DICOS
         prompt_template = """
-Você é um sistema de apoio ao diagnóstico clínico utilizado por médicos.
+VocÃª Ã© um sistema de apoio ao diagnÃ³stico clÃ­nico utilizado por mÃ©dicos.
 
-Com base nos sintomas fornecidos e nos documentos médicos recuperados,
-liste até 5 possíveis diagnósticos diferenciais mais prováveis.
+Com base nos sintomas fornecidos e nos documentos mÃ©dicos recuperados,
+liste atÃ© 5 possÃ­veis diagnÃ³sticos diferenciais mais provÃ¡veis.
 
-Responda apenas com os nomes das doenças, um por linha.
+Responda apenas com os nomes das doenÃ§as, um por linha.
 
-Informações do paciente e sintomas:
+InformaÃ§Ãµes do paciente e sintomas:
 {input}
 
-Documentos médicos relevantes:
+Documentos mÃ©dicos relevantes:
 {context}
 """
 
@@ -84,6 +84,6 @@ Documentos médicos relevantes:
         return chain
 
     except Exception as e:
-        print("❌ Erro ao criar chain RAG:")
+        print("âŒ Erro ao criar chain RAG:")
         traceback.print_exc()
         return None
